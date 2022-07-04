@@ -14,23 +14,31 @@ Each branch contains three folders, with 2 `ConfigMap` resources and a `kustomiz
 ```
 .
 ├── pathA
-│   ├── config-map.yaml
+│   ├── config-map-field.yaml
+│   ├── config-map-resource.yaml
 │   └── kustomization.yaml
 ├── pathB
-│   ├── config-map.yaml
+│   ├── config-map-field.yaml
+│   ├── config-map-resource.yaml
 │   └── kustomization.yaml
 ├── pathC
-│   ├── config-map.yaml
+│   ├── config-map-field.yaml
+│   ├── config-map-resource.yaml
 │   └── kustomization.yaml
 └── README.md
 ```
-The `config-map.yaml` contains a simple `ConfigMap` resource, which describes which repository url/branch/path it is defined in. This can be useful for testing changes to the url/branch/path fields of a GitOpsDeployment or Argo CD Application.
 
-The `kustomization.yaml` is basic, and just points to the `ConfigMap` resource.
+The `config-map-field.yaml` contains a simple `ConfigMap` resource, which describes which repository url/branch/path it is defined in. This can be useful for testing changes to the url/branch/path fields of a GitOpsDeployment or Argo CD Application.
+
+The `config-map-reource.yaml` likewise contains a simple `ConfigMap` resource, but this one is named after the url/branch/path it exists in. This can be useful for testing whether resources have been pruned (deleted) when switching between paths/branches/repo urls in a GitOpsDeployment.
+
+
+The `kustomization.yaml` is basic, and just points to the `ConfigMap` resources.
 
 ### `ConfigMap` resource contents
 
-Every `config-map.yaml`, in every repository/branch/path, contains an identifier (under `.data.identifier`) which indicates the specific url/branch/path that is being deployed.
+Every `config-map-field.yaml`, in every repository/branch/path, contains an identifier (under `.data.identifier`) which indicates the specific url/branch/path that is being deployed.
+Every `config-map-indicator.yaml`, in every repository/branch/path, contains a `.metadata.name` field which indicates the specific url/branch/path that is being deployed.
 
 For example:
 ```bash
@@ -49,16 +57,22 @@ kustomize build .
 will output:
 ```yaml
 apiVersion: v1
+data: {}
+kind: ConfigMap
+metadata:
+  name: deployment-permutations-a-branchB-pathC
+---
+apiVersion: v1
+data:
+  identifier: (deployment-permutations-a)-(branchB)-(pathC)
 kind: ConfigMap
 metadata:
   name: identifier
-data:
-  identifier: "(deployment-permutations-a)-(branchB)-(pathC)"
 ```
 
-The `ConfigMap` resources are otherwise equal (same name, nil namespace) to another other between permutations.
+The `ConfigMap` resources are otherwise equal to another other between permutations.
 
-Test cases can then use the `identifier` value of the ConfigMap to ensure that the correct repository URL/branch/path has been deployed.
+Test cases can then use the `identifier` or `name` value of the ConfigMaps to ensure that the correct repository URL/branch/path has been deployed.
 
 ### How to deploy one of these permutations using a `GitOpsDeployment` resource or Argo CD `Application` resource
 
@@ -84,7 +98,7 @@ spec:
     targetRevision: branchB
 ```
 
-The `ConfigMap` resource that Argo CD deploys should then contain an `.data.identifier` field with the value of `(deployment-permutations-a)-(branchB)-(pathC)`.
+The `ConfigMap` resource that Argo CD deploys should then contain an `.data.identifier` or `.metadata.name` field with the value of `(deployment-permutations-a)-(branchB)-(pathC)`.
 
 ### How to manually deploy one of these permutations
 
