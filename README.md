@@ -10,7 +10,7 @@ Each repository contains three branches:
 - branchB
 - branchC
 
-Each branch contains three folders, with a `ConfigMap` resource and a `kustomization.yaml` defined within each folder:
+Each branch contains three folders, with 2 `ConfigMap` resources and a `kustomization.yaml` defined within each folder:
 ```
 .
 ├── pathA
