@@ -28,9 +28,9 @@ Each branch contains three folders, with 2 `ConfigMap` resources and a `kustomiz
 └── README.md
 ```
 
-The `config-map-field.yaml` contains a simple `ConfigMap` resource, which describes which repository url/branch/path it is defined in. This can be useful for testing changes to the url/branch/path fields of a GitOpsDeployment or Argo CD Application.
+The `config-map-field.yaml` contains a simple `ConfigMap` resource, which has a `data` field describing which repository url/branch/path it is defined in. This can be useful for testing changes to the url/branch/path fields of a GitOpsDeployment or Argo CD Application.
 
-The `config-map-reource.yaml` likewise contains a simple `ConfigMap` resource, but this one is named after the url/branch/path it exists in. This can be useful for testing whether resources have been pruned (deleted) when switching between paths/branches/repo urls in a GitOpsDeployment.
+The `config-map-resource.yaml` likewise contains a simple `ConfigMap` resource, but this one is named after the url/branch/path it exists in. This can be useful for testing whether resources have been pruned (deleted) when switching between paths/branches/repo urls in a GitOpsDeployment.
 
 
 The `kustomization.yaml` is basic, and just points to the `ConfigMap` resources.
@@ -38,6 +38,7 @@ The `kustomization.yaml` is basic, and just points to the `ConfigMap` resources.
 ### `ConfigMap` resource contents
 
 Every `config-map-field.yaml`, in every repository/branch/path, contains an identifier (under `.data.identifier`) which indicates the specific url/branch/path that is being deployed.
+
 Every `config-map-indicator.yaml`, in every repository/branch/path, contains a `.metadata.name` field which indicates the specific url/branch/path that is being deployed.
 
 For example:
